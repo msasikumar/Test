@@ -1,0 +1,29 @@
+H DFTACTGRP(*NO) ACTGRP(*NEW)
+
+Dcl-S jsonString  Varchar(500);
+Dcl-S url        Varchar(200) Inz('https://yourserver:5000/api/calculate');
+Dcl-S result     Varchar(2000);
+Dcl-S httpStatus Int(10);
+
+Dcl-Pr QSYS2_HTTP_POST Varchar(2000) ExtProc('QSYS2.HTTP_POST');
+  url           Varchar(1024) Const;
+  requestBody   Varchar(100000) Const Options(*VarSize);
+  userId        Varchar(128) Const Options(*NoPass);
+  password      Varchar(128) Const Options(*NoPass);
+  contentType   Varchar(256) Const Options(*NoPass);
+  httpStatus    Int(10) Const Options(*NoPass:*VarSize);
+End-Pr;
+
+ // Create JSON string
+jsonString = '{ "number1": 5, "number2": 10 }';
+
+ // Call the web service using QSYS2.HTTP_POST
+result = QSYS2_HTTP_POST(url: jsonString: '': '': 'application/json': httpStatus);
+
+If httpStatus <> 200;
+  Dsply ('HTTP Error: ' + %Char(httpStatus));
+Else;
+  Dsply ('Result: ' + %Trim(result));
+Endif;
+
+*inlr = *on;
